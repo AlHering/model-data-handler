@@ -24,6 +24,18 @@ class AbstractAPIWrapper(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def get_api_url(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> str:
+        """
+        Abstract method for acquring API URL for model.
+        :param identifier: Type of identification.
+        :model_id: Identification of specified type.
+        :param args: Arbitrary arguments.
+        :param kwargs: Arbitrary keyword arguments.
+        :return: API URL for given model ID.
+        """
+        pass
+
+    @abc.abstractmethod
     def collect_metadata(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> dict:
         """
         Abstract method for acquring model data by identifier.
