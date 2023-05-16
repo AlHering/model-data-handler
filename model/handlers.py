@@ -21,14 +21,16 @@ class AbstractHandler(abc.ABC):
         self.cache = {}
         self.api = api_wrapper
 
-    def collect_metadata(identifier: str, model_id: Any) -> dict:
+    def collect_metadata(identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> dict:
         """
         Method for acquring model data by identifier.
         :param identifier: Type of identification.
         :model_id: Identification of specified type.
+        :param args: Arbitrary arguments.
+        :param kwargs: Arbitrary keyword arguments.
         :return: Metadata for given model ID.
         """
-        return self.api.collect_metadata(identifier, model_id)
+        return self.api.collect_metadata(identifier, model_id, *args, **kwargs)
 
     def import_data(import_path: str) -> None:
         """
