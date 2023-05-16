@@ -7,7 +7,7 @@
 """
 from typing import Any, Optional, List
 import abc
-from api_wrapper import AbstractAPIWrapper
+from model.abstract_api_wrapper import AbstractAPIWrapper
 from utility.bronze import json_utility
 
 class AbstractHandler(abc.ABC):
