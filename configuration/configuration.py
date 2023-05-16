@@ -8,4 +8,7 @@
 import paths as PATHS
 from dotenv import load_dotenv
 
-load_dotenv()
+
+ENV = load_dotenv(".env")
+CIVITAI_API_KEY = ENV["CIVITAI_API_KEY"]
+HUGGINGFACE_API_KEY = ENV["HUGGINGFACE_API_KEY"]
