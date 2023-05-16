@@ -13,8 +13,8 @@ from typing import Any, Optional
 from typing import Union, List
 
 import logging
-from common_data_controller.utility.silver import internet_utility
-from common_data_controller.utility.bronze import comparison_utility
+from ..silver import internet_utility
+from ..bronze import comparison_utility
 
 logger = logging.Logger("[Utility]")
 check_connection = internet_utility.check_connection
