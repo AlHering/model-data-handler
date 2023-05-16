@@ -14,7 +14,7 @@ class AbstractAPIWrapper(abc.ABC):
     Abstract class, representing a API wrapper object.
     """
     @abc.abstractmethod
-    def check_connection(*args: Optional[List], **kwargs: Optional[dict]) -> bool:
+    def check_connection(self, *args: Optional[List], **kwargs: Optional[dict]) -> bool:
         """
         Abstract method for checking connection.
         :param args: Arbitrary arguments.
@@ -24,7 +24,7 @@ class AbstractAPIWrapper(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def collect_metadata(identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> dict:
+    def collect_metadata(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> dict:
         """
         Abstract method for acquring model data by identifier.
         :param identifier: Type of identification.

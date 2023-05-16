@@ -14,14 +14,14 @@ class AbstractHandler(abc.ABC):
     """
     Abstract class, representing a handler object.
     """
-    def __init__(api_wrapper: AbstractAPIWrapper) -> None:
+    def __init__(self, api_wrapper: AbstractAPIWrapper) -> None:
         """
         Initiation method for handler objects
         """
         self.cache = {}
         self.api = api_wrapper
 
-    def collect_metadata(identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> dict:
+    def collect_metadata(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> dict:
         """
         Method for acquring model data by identifier.
         :param identifier: Type of identification.
@@ -32,14 +32,14 @@ class AbstractHandler(abc.ABC):
         """
         return self.api.collect_metadata(identifier, model_id, *args, **kwargs)
 
-    def import_data(import_path: str) -> None:
+    def import_data(self, import_path: str) -> None:
         """
         Method for importing data.
         :param import_path: Import path.
         """
         self.cache = json_utility.load(import_path)
 
-    def export_data(export_path: str) -> None:
+    def export_data(self, export_path: str) -> None:
         """
         Method for exporting data.
         :param export_path: Export path.
@@ -47,7 +47,7 @@ class AbstractHandler(abc.ABC):
         json_utility.save(self.cache, export_path)
 
     @abc.abstractmethod
-    def load_model_folder(*args: Optional[List], **kwargs: Optional[dict]) -> None:
+    def load_model_folder(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
         Abstract method for loading model folder.
         :param args: Arbitrary arguments.
@@ -56,7 +56,7 @@ class AbstractHandler(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def update_metadata(*args: Optional[List], **kwargs: Optional[dict]) -> None:
+    def update_metadata(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
         Abstract method for updating cached metadata.
         :param args: Arbitrary arguments.
@@ -65,7 +65,7 @@ class AbstractHandler(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def organize_models(*args: Optional[List], **kwargs: Optional[dict]) -> None:
+    def organize_models(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
         Abstract method for organizing local models.
         :param args: Arbitrary arguments.
@@ -74,7 +74,7 @@ class AbstractHandler(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def download_model(*args: Optional[List], **kwargs: Optional[dict]) -> None:
+    def download_model(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
         Abstract method for downloading a model.
         :param args: Arbitrary arguments.
@@ -83,7 +83,7 @@ class AbstractHandler(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def download_asset(*args: Optional[List], **kwargs: Optional[dict]) -> None:
+    def download_asset(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
         Abstract method for downloading an asset.
         :param args: Arbitrary arguments.
