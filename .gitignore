@@ -160,6 +160,8 @@ cython_debug/
 .idea/
 
 # Further additions
-*/.env
+**/.env
 configuration/.env
+configuration/.env/
+configuration/.env*
 data/
