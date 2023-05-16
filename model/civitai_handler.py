@@ -10,7 +10,7 @@ import copy
 from typing import Any, Optional, List
 from abstract_handler import AbstractHandler
 from civitai_api_wrapper import CivitaiAbstractAPIWrapper
-from ..utility.bronze import hashing_utility
+from ..utility.bronze import hashing_utility, dictionary_utility
 from ..configuration import configuration as cfg
 
 
@@ -68,7 +68,10 @@ class CivitaiHandler(AbstractHandler):
         :param args: Arbitrary arguments.
         :param kwargs: Arbitrary keyword arguments.
         """
-        pass
+        for model in self.cache["local_models"]:
+            metadata = self.collect_metadata("hash", model["sha256"])
+            if metadata and not dictionary_utility.check_equality(model["metadata"], metadata):
+                model["metadata"] = copy.deepcopy(metadata)
 
     def organize_models(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
