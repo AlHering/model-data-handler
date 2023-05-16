@@ -33,6 +33,17 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
         :return: True if connection was established successfuly else False.
         """
         return requests.get(self.base_url).status_code == 200
+    
+    def get_api_url(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> str:
+        """
+        Abstract method for acquring API URL for model.
+        :param identifier: Type of identification.
+        :model_id: Identification of specified type.
+        :param args: Arbitrary arguments.
+        :param kwargs: Arbitrary keyword arguments.
+        :return: API URL for given model ID.
+        """
+        return {"hash": self.model_by_versionhash_url, "id": self.model_by_id_url}[identifier] + str(model_id)
 
     def collect_metadata(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> dict:
         """
@@ -43,7 +54,7 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
         :param kwargs: Arbitrary keyword arguments.
         :return: Metadata for given model ID.
         """
-        resp = requests.get({"hash": self.model_by_versionhash_url, "id": self.model_by_id_url}[identifier] + str(model_id), headers={"Authorization": cfg.CIVITAI_API_KEY})
+        resp = requests.get(self.get_api_url(identifier, model_id), headers={"Authorization": cfg.CIVITAI_API_KEY})
         try:
             meta_data = json.loads(resp.content)
             if meta_data is not None and not "error" in meta_data:
