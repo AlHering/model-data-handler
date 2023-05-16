@@ -8,6 +8,7 @@
 import paths as PATHS
 from dotenv import load_dotenv
 
+
 """
 ENVIRONMENT FILE
 """
