@@ -9,3 +9,5 @@ Create a soft-link to that file, name it `.env` and put only the soft-link into 
 The `.env` file should contain:
 - CIVITAI_API_KEY: Your civitai API key.
 - HUGGINGFACE_API_KEY: Your Huggingface API key.
+- IGNORE_MODEL_SUBFOLDERS: List of subfolders inside model folders to ignore.
+- IGNORE_MODEL_FILES: List of model files inside model folders to ignore.
