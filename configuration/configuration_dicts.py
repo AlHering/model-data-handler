@@ -48,7 +48,7 @@ CIVITAI_FOLDER_STRUCTURE = {
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "CHECKPOINTS", "QUAL"),
                 "sort_into": lambda data: data["metadata"]["type"].lower() == "checkpoint" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
-                    main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealistic", "painted", "cartoon", "anime"]
+                    main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealim", "illustration", "cartoon", "anime"]
                 }
             },
             "CHECKPOINTS/NSFW": {
@@ -56,7 +56,7 @@ CIVITAI_FOLDER_STRUCTURE = {
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "CHECKPOINTS", "QUAL"),
                 "sort_into": lambda data: data["metadata"]["type"].lower() == "checkpoint" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
-                    main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealistic", "painted", "cartoon", "anime"]
+                    main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealim", "illustration", "cartoon", "anime"]
                 }
             },
             "CODEFORMER": {
@@ -224,7 +224,7 @@ CIVITAI_FOLDER_STRUCTURE = {
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP", "QUAL"),
                 "sort_into": lambda data: data["metadata"]["type"].lower() == "vae" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
-                    main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealistic", "painted", "cartoon", "anime"]
+                    main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealim", "illustration", "cartoon", "anime"]
                 }
             },
             "VAE/NSFW": {
@@ -232,7 +232,7 @@ CIVITAI_FOLDER_STRUCTURE = {
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP", "QUAL"),
                 "sort_into": lambda data: data["metadata"]["type"].lower() == "vae" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
-                    main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealistic", "painted", "cartoon", "anime"]
+                    main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealim", "illustration", "cartoon", "anime"]
                 }
             },
             "WILDCARDS": {
@@ -252,3 +252,22 @@ CIVITAI_FOLDER_STRUCTURE = {
                 }
             }
         }
+
+
+CIVITAI_TAGS_A = {
+    "photorealism": ["photorealistic", "photorealism", "realistic"],
+    "illustration": ["illustration"],
+    "cartoon": ["cartoon"],
+    "anime": ["anime"],
+    "mixed": ["*"]
+}
+
+
+CIVITAI_TAGS_B = {
+    "person": ["person", "character", "celebrity", "pornstar"],
+    "clothig": ["clothing", "fashion", "dress"],
+    "action": ["#CHECK_MANUALLY"],
+    "background": ["background", "backgrounds", "landscape", "landscapes", "scenery"],
+    "concept": ["concept"],
+    "style": ["style"]
+}
