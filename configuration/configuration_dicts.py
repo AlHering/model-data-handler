@@ -264,7 +264,7 @@ CIVITAI_TAGS_A = {
 
 
 CIVITAI_TAGS_B = {
-    "person": ["person", "character", "celebrity", "pornstar"],
+    "person": ["person", "character", "celebrity", "star", "singer", "actor", "pornstar"],
     "clothig": ["clothing", "fashion", "dress"],
     "action": ["#CHECK_MANUALLY"],
     "background": ["background", "backgrounds", "landscape", "landscapes", "scenery"],
