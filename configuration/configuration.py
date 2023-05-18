@@ -6,6 +6,7 @@
 ****************************************************
 """
 import paths as PATHS
+import configuration_dicts as DICTS
 from dotenv import load_dotenv
 
 
