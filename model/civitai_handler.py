@@ -7,6 +7,7 @@
 """
 import os
 import copy
+import numpy
 from typing import Any, Optional, List
 from abstract_handler import AbstractHandler
 from civitai_api_wrapper import CivitaiAbstractAPIWrapper
@@ -43,7 +44,7 @@ class CivitaiHandler(AbstractHandler):
                 if model_file not in cfg.IGNORE_MODEL_FILES and not ignored_subfolder:
                     file_name, file_ext = os.path.splitext(model_file)
                     model_data = {
-                        "file": file_name,
+                        "file": model_file,
                         "extension": file_ext,
                         "folder": root,
                         "path": full_model_path,
@@ -73,6 +74,18 @@ class CivitaiHandler(AbstractHandler):
             if metadata and not dictionary_utility.check_equality(model["metadata"], metadata):
                 model["metadata"] = copy.deepcopy(metadata)
 
+    def calculate_local_metadata(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
+        """
+        Method for calculating local cached metadata.
+        :param args: Arbitrary arguments.
+        :param kwargs: Arbitrary keyword arguments.
+        """
+        for model in [m for m in self.cache["local_models"] if "metadata" in m]:
+            model["local_metadata"] = model.get("local_metadata", {})
+            model["local_metadata"]["nsfw"] = model["local_metadata"].get("nsfw", 
+                                                                          {"model": model["metadata"]["nsfw"],
+                                                                           "image_score": self._calculate_image_nsfw_score(model)})        
+
     def organize_models(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
         Method for organizing local models.
@@ -96,3 +109,23 @@ class CivitaiHandler(AbstractHandler):
         :param kwargs: Arbitrary keyword arguments.
         """
         pass
+
+    def _calculate_image_nsfw_score(model: dict) -> Optional[float]:
+        """
+        Internal method for calculating the image based NSFW-score for a model.
+        :param model_metadata: Model data.
+        :return: Float, describing the models image based NSFW-score or None if image check failed.
+        """
+        score = None
+        full_image_count = 0
+        full_nsfw_count = 0
+        for model_version in model["metadata"]["modelVersions"]:
+            full_image_count += len(model_version["images"])
+            full_nsfw_count += len([img for img in model_version["images"] if img["nsfw"]])
+            if any(model["file"] == file for file in model_version["files"]):
+                image_count = len(model_version["images"])
+                nsfw_count = len([img for img in model_version["images"] if img["nsfw"]])
+                score = numpy.round(numpy.true_divide(nsfw_count, image_count), decimals=2)
+        if score is None:
+            score = numpy.round(numpy.true_divide(full_nsfw_count, full_image_count), decimals=2)
+        return score
