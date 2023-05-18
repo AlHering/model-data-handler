@@ -161,6 +161,7 @@ cython_debug/
 
 # Further additions
 **/.env
+**/.env**
 configuration/.env
 configuration/.env/
 configuration/.env*
