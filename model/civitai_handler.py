@@ -155,3 +155,6 @@ class CivitaiHandler(AbstractHandler):
             not_containing_other = not any(any(tag in model["local_metadata"]["tags"] for tag in current_reference[other_type]) for other_type in current_reference if other_type != main_type)
             if containing_main and not_containing_other:
                 return main_type
+        for main_type in current_reference:
+            if "*" in current_reference[main_type]:
+                return main_type
