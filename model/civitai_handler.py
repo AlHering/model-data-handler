@@ -24,6 +24,7 @@ class CivitaiHandler(AbstractHandler):
         Initiation method.
         """
         super().__init__(api_wrapper)
+        self.nsfw_image_score_threshold = 0.3
 
     def load_model_folder(self, model_folder: str, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
@@ -48,7 +49,8 @@ class CivitaiHandler(AbstractHandler):
                         "extension": file_ext,
                         "folder": root,
                         "path": full_model_path,
-                        "sha256": hashing_utility.hash_with_sha256(full_model_path)
+                        "sha256": hashing_utility.hash_with_sha256(full_model_path),
+                        "status": "found"
                     }
                     api_data = self.collect_metadata("hash", model_data["sha256"])
                     if api_data:
@@ -56,6 +58,7 @@ class CivitaiHandler(AbstractHandler):
                         model_data["api_url"] = self.api.get_api_url("id", api_data["modelId"])
                         model_data["source"] = self.api.base_url
                         self.cache["local_models"].append(copy.deepcopy(model_data))
+                        model_data["status"] = "collected"
                     else:
                         self.cache["not_tracked"].append(full_model_path)
                 else:
@@ -84,7 +87,13 @@ class CivitaiHandler(AbstractHandler):
             model["local_metadata"] = model.get("local_metadata", {})
             model["local_metadata"]["nsfw"] = model["local_metadata"].get("nsfw", 
                                                                           {"model": model["metadata"]["nsfw"],
-                                                                           "image_score": self._calculate_image_nsfw_score(model)})        
+                                                                           "image_score": self._calculate_image_nsfw_score(model)})
+            if "ssot" not in model["local_metadata"]["nsfw"]:
+                model["local_metadata"]["nsfw"]["ssot"] = model["local_metadata"]["nsfw"]["model"] or model["local_metadata"]["nsfw"]["image_score"] >= self.nsfw_image_score_threshold
+            
+            model["local_metadata"]["tags"] = model["metadata"].get("tags", {}).values()
+            model["local_metadata"]["main_tag"] = self._calculate_main_tag(model)
+            model["status"] = "qual"
 
     def organize_models(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
@@ -129,3 +138,20 @@ class CivitaiHandler(AbstractHandler):
         if score is None:
             score = numpy.round(numpy.true_divide(full_nsfw_count, full_image_count), decimals=2)
         return score
+
+    def _calculate_main_tag(model: dict) -> Optional[str]:
+        """
+        Internal method for calculating the main model tag.
+        :param model_metadata: Model data.
+        :return: Main model tag or None, if none was found.
+        """
+        if model["metadata"]["type"].lower() in ["checkpoint", "vae"]:
+            current_reference = cfg.DICTS.CIVITAI_TAGS_A
+        else:
+            current_reference = cfg.DICTS.CIVITAI_TAGS_B
+
+        for main_type in current_reference:
+            containing_main = any(tag in model["local_metadata"]["tags"] for tag in current_reference[main_type]) 
+            not_containing_other = not any(any(tag in model["local_metadata"]["tags"] for tag in current_reference[other_type]) for other_type in current_reference if other_type != main_type)
+            if containing_main and not_containing_other:
+                return main_type
