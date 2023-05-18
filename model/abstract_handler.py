@@ -65,6 +65,15 @@ class AbstractHandler(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def calculate_local_metadata(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
+        """
+        Abstract method for calculating local cached metadata.
+        :param args: Arbitrary arguments.
+        :param kwargs: Arbitrary keyword arguments.
+        """
+        pass
+
+    @abc.abstractmethod
     def organize_models(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
         Abstract method for organizing local models.
