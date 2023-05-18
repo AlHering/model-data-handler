@@ -5,6 +5,12 @@
 *            (c) 2023 Alexander Hering             *
 ****************************************************
 """
+import os
+from dotenv import load_dotenv
+from utility.silver.environment_utility import get_lambda_function_from_string
+ENV = load_dotenv(".env")
+
+
 """
 Folder organizing configurations in the form
 <HANDLER>_FOLDER_STRUCTURE = {
@@ -24,12 +30,6 @@ Example:
     "sort_into": get_lambda_function_from_string(ENV["MY_SORTING_LAMBDA_FOR_<MODEL_TYPE>"]),
 ...
 """
-import os
-from dotenv import load_dotenv
-from utility.silver.environment_utility import get_lambda_function_from_string
-ENV = load_dotenv(".env")
-
-
 CIVITAI_FOLDER_STRUCTURE = {
             "BLIP": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP"),
@@ -254,6 +254,15 @@ CIVITAI_FOLDER_STRUCTURE = {
         }
 
 
+"""
+Tag organizing configurations in the form
+<MODEL_TYPE_COLLECTION> = {
+    "<MAIN_TAG>": <LIST OF TAGS THAT IDENTIFY <MAIN TAG>>
+    ...
+}
+
+Note, that these configurations are used with separate logic inside the apropriate handler to automatically declare main tags.
+"""
 CIVITAI_TAGS_A = {
     "photorealism": ["photorealistic", "photorealism", "realistic"],
     "illustration": ["illustration"],
