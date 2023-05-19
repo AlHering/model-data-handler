@@ -132,7 +132,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "LORA": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LORA"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LORA", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "lora" and data["status"] == "qual" and and not data["local_metadata"].get("archived", False) not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "lora" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
