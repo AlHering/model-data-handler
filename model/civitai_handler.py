@@ -119,6 +119,16 @@ class CivitaiHandler(AbstractHandler):
         :param args: Arbitrary arguments.
         :param kwargs: Arbitrary keyword arguments.
         """
+        organizing_dict = cfg.DICTS.CIVITAI_FOLDER_STRUCTURE
+        for model_type in organizing_dict:
+            for root, dirs, files in os.walk(organizing_dict[model_type]["staging_folder"], topdown=True):
+    
+    def reorganize_models(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
+        """
+        Method for reorganizing local models.
+        :param args: Arbitrary arguments.
+        :param kwargs: Arbitrary keyword arguments.
+        """
         pass
 
     def download_model(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
