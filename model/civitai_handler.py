@@ -137,12 +137,13 @@ class CivitaiHandler(AbstractHandler):
         """
         pass
 
-    def _calculate_image_nsfw_score(model: dict) -> Optional[float]:
+    def _calculate_image_nsfw_score(self, model: dict) -> Optional[float]:
         """
         Internal method for calculating the image based NSFW-score for a model.
         :param model_metadata: Model data.
         :return: Float, describing the models image based NSFW-score or None if image check failed.
         """
+        self._logger.info(f"Calculating image NSFW-score for '{model['file']}'...")
         score = None
         full_image_count = 0
         full_nsfw_count = 0
@@ -154,10 +155,12 @@ class CivitaiHandler(AbstractHandler):
                 nsfw_count = len([img for img in model_version["images"] if img["nsfw"]])
                 score = numpy.round(numpy.true_divide(nsfw_count, image_count), decimals=2)
         if score is None:
+            self._logger.warn(f"Could not calculate version specific score for '{model['file']}',\ncalculating score over all versions...")
             score = numpy.round(numpy.true_divide(full_nsfw_count, full_image_count), decimals=2)
+        self._logger.info(f"Calculated {score} for '{model['file']}'.")
         return score
 
-    def _calculate_main_tag(model: dict) -> Optional[str]:
+    def _calculate_main_tag(self, model: dict) -> Optional[str]:
         """
         Internal method for calculating the main model tag.
         :param model_metadata: Model data.
@@ -177,7 +180,7 @@ class CivitaiHandler(AbstractHandler):
             if "*" in current_reference[main_type]:
                 return main_type
             
-    def interactively_type_model(model: dict) -> Optional[str]:
+    def interactively_type_model(self, model: dict) -> Optional[str]:
         """
         Internal method for calculating the main model tag.
         :param model_metadata: Model data.
