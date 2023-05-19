@@ -26,4 +26,4 @@ Further configuration
 MODEL_EXTENSIONS = [".ckpt", ".safetensors", ".pt", ".pth", ".zip"]
 
 DB_URI = ENV.get("DB_URI", f"sqlite:///{PATHS.DATA_PATH}/model_data_handlers.db")
-DB_FLAVOR = ENV.get("DB_FLAVOR", "sqlite")
+DB_DIALECT = ENV.get("DB_DIALECT", "sqlite")
