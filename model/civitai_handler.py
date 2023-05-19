@@ -70,6 +70,7 @@ class CivitaiHandler(AbstractHandler):
                             self.cache["local_models"].append(copy.deepcopy(model_data))
                             self.cache["tracked"].append(full_model_path)
                         else:
+                            self._logger.info(f"Could not load metadata, handler will not track '{model_file}'.")
                             self.cache["not_tracked"].append(full_model_path)
                     else:
                         self._logger.info(f"Ignoring '{model_file}'.")
@@ -87,8 +88,10 @@ class CivitaiHandler(AbstractHandler):
         :param kwargs: Arbitrary keyword arguments.
         """
         for model in self.cache["local_models"]:
+            self._logger.info(f"Updating '{model['file']}' metadata.")
             metadata = self.collect_metadata("hash", model["sha256"])
             if metadata and not dictionary_utility.check_equality(model["metadata"], metadata):
+                self._logger.info(f"Changes detected for '{model['file']}', updating...")
                 model["metadata"] = copy.deepcopy(metadata)
 
     def calculate_local_metadata(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
@@ -98,6 +101,7 @@ class CivitaiHandler(AbstractHandler):
         :param kwargs: Arbitrary keyword arguments.
         """
         for model in [m for m in self.cache["local_models"] if "metadata" in m]:
+            self._logger.info(f"Calculating local metadata for '{model['file']}'...")
             model["local_metadata"] = model.get("local_metadata", {})
             model["local_metadata"]["nsfw"] = model["local_metadata"].get("nsfw", 
                                                                           {"model": model["metadata"]["nsfw"],
