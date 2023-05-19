@@ -166,6 +166,8 @@ class CivitaiHandler(AbstractHandler):
         :param model_metadata: Model data.
         :return: Main model tag or None, if none was found.
         """
+        result = None
+        self._logger.info(f"Calculating main tag for '{model['file']}'...")
         if model["metadata"]["type"].lower() in ["checkpoint", "vae"]:
             current_reference = cfg.DICTS.CIVITAI_TAGS_A
         else:
@@ -175,27 +177,18 @@ class CivitaiHandler(AbstractHandler):
             containing_main = any(tag in model["local_metadata"]["tags"] for tag in current_reference[main_type]) 
             not_containing_other = not any(any(tag in model["local_metadata"]["tags"] for tag in current_reference[other_type]) for other_type in current_reference if other_type != main_type)
             if containing_main and not_containing_other:
-                return main_type
-        for main_type in current_reference:
-            if "*" in current_reference[main_type]:
-                return main_type
+                result =  main_type
+        if main_type is None:
+            for main_type in current_reference:
+                if "*" in current_reference[main_type]:
+                    result = main_type
+        self._logger.info(f"Calculated '{result}' for '{model['file']}'...") if result is not None else self._logger.warn(f"Could not calculate main tag for '{model['file']}'.")
+        return result
             
-    def interactively_type_model(self, model: dict) -> Optional[str]:
+    def _interactively_set_model_tag(self, model: dict) -> Optional[str]:
         """
-        Internal method for calculating the main model tag.
+        Internal method for interactively adding the main model tag.
         :param model_metadata: Model data.
-        :return: Main model tag or None, if none was found.
+        :return: Main model tag or None, if none was set.
         """
-        if model["metadata"]["type"].lower() in ["checkpoint", "vae"]:
-            current_reference = cfg.DICTS.CIVITAI_TAGS_A
-        else:
-            current_reference = cfg.DICTS.CIVITAI_TAGS_B
-
-        for main_type in current_reference:
-            containing_main = any(tag in model["local_metadata"]["tags"] for tag in current_reference[main_type]) 
-            not_containing_other = not any(any(tag in model["local_metadata"]["tags"] for tag in current_reference[other_type]) for other_type in current_reference if other_type != main_type)
-            if containing_main and not_containing_other:
-                return main_type
-        for main_type in current_reference:
-            if "*" in current_reference[main_type]:
-                return main_type
+        pass
