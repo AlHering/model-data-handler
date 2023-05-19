@@ -20,7 +20,7 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
         """
         Initiation method.
         """
-        self.logger = Logger("[CivitaiAbstractAPIWrapper]")
+        self._logger = Logger("[CivitaiAbstractAPIWrapper]")
         self.base_url = "https://civitai.com/"
         self.api_base_url = "https://civitai.com/api/v1/"
         self.model_by_versionhash_url = "https://civitai.com/api/v1/model-versions/by-hash/"
@@ -34,7 +34,7 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
         :return: True if connection was established successfuly else False.
         """
         result = requests.get(self.base_url).status_code == 200
-        self.logger.info("Connection was successfuly established.") if result else self.logger.warn("Connection could not be established.") 
+        self._logger.info("Connection was successfuly established.") if result else self._logger.warn("Connection could not be established.") 
         return result
     
     def get_api_url(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> str:
@@ -57,15 +57,15 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
         :param kwargs: Arbitrary keyword arguments.
         :return: Metadata for given model ID.
         """
-        self.logger.info(f"Fetching metadata for model with '{model_id}' as '{identifier}'...")
+        self._logger.info(f"Fetching metadata for model with '{model_id}' as '{identifier}'...")
         resp = requests.get(self.get_api_url(identifier, model_id), headers={"Authorization": cfg.CIVITAI_API_KEY})
         try:
             meta_data = json.loads(resp.content)
             if meta_data is not None and not "error" in meta_data:
-                self.logger.info(f"Fetching metadata was successful.")
+                self._logger.info(f"Fetching metadata was successful.")
                 return meta_data
             else:
-                self.logger.warn(f"Fetching metadata failed.")
+                self._logger.warn(f"Fetching metadata failed.")
         except json.JSONDecodeError:
-                self.logger.warn(f"Metadata response could not be deserialized.")
+                self._logger.warn(f"Metadata response could not be deserialized.")
                 return {}

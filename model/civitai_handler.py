@@ -26,7 +26,7 @@ class CivitaiHandler(AbstractHandler):
         """
         super().__init__(api_wrapper)
         self.nsfw_image_score_threshold = 0.3
-        self.logger = Logger("[CivitaiHandler]")
+        self._logger = Logger("[CivitaiHandler]")
 
     def load_model_folder(self, model_folder: str, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
