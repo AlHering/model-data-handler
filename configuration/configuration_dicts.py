@@ -46,7 +46,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "CHECKPOINTS": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "CHECKPOINTS"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "CHECKPOINTS", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "checkpoint" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "checkpoint" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealim", "illustration", "cartoon", "anime"]
                 }
@@ -54,7 +54,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "CHECKPOINTS/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "CHECKPOINTS", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "CHECKPOINTS", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "checkpoint" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "checkpoint" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealim", "illustration", "cartoon", "anime"]
                 }
@@ -80,13 +80,13 @@ CIVITAI_FOLDER_STRUCTURE = {
             "EMBEDDINGS": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "EMBEDDINGS"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "EMBEDDINGS", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "embedding" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "embedding" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {}
             },
             "EMBEDDINGS/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "EMBEDDINGS", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "EMBEDDINGS", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "embedding" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "embedding" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {}
             },
             "ESRGAN": {
@@ -104,7 +104,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "HYPERNETWORKS": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "HYPERNETWORKS"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "HYPERNETWORKS", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "hypernetwork" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "hypernetwork" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -112,7 +112,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "HYPERNETWORKS/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "HYPERNETWORKS", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "HYPERNETWORKS", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "hypernetwork" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "hypernetwork" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -132,7 +132,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "LORA": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LORA"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LORA", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "lora" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "lora" and data["status"] == "qual" and and not data["local_metadata"].get("archived", False) not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -140,7 +140,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "LORA/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LORA", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LORA", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "lora" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "lora" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -148,7 +148,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "LYCORIS": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LYCORIS"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LYCORIS", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "lycoris" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "lycoris" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -156,7 +156,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "LYCORIS/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LYCORIS", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "LYCORIS", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "lycoris" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "lycoris" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -164,13 +164,13 @@ CIVITAI_FOLDER_STRUCTURE = {
             "POSES": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "POSES"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "POSES", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "poses" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "poses" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {}
             },
             "POSES/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "POSES", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "POSES", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "poses" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "poses" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {}
             },
             "REAL_ESRGAN": {
@@ -200,7 +200,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "TEXTUAL_INVERSION": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "TEXTUAL_INVERSION"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "textual inversion" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "textual inversion" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -208,7 +208,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "TEXTUAL_INVERSION/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "TEXTUAL_INVERSION", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "textual inversion" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "textual inversion" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -222,7 +222,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "VAE": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "VAE"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "vae" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "vae" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealim", "illustration", "cartoon", "anime"]
                 }
@@ -230,7 +230,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "VAE/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "VAE", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "vae" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "vae" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["mixed", "photorealim", "illustration", "cartoon", "anime"]
                 }
@@ -238,7 +238,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "WILDCARDS": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "WILDCARDS"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "wildcards" and data["status"] == "qual" and not data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "wildcards" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and not data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -246,7 +246,7 @@ CIVITAI_FOLDER_STRUCTURE = {
             "WILDCARDS/NSFW": {
                 "root_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "WILDCARDS", "NSFW"),
                 "staging_folder": os.path.join(ENV["CIVITAI_MODEL_ROOT"], "BLIP", "QUAL"),
-                "sort_into": lambda data: data["metadata"]["type"].lower() == "wildcards" and data["status"] == "qual" and data["local_metadata"]["nsfw"]["ssot"],
+                "sort_into": lambda data: data["metadata"]["type"].lower() == "wildcards" and data["status"] == "qual" and not data["local_metadata"].get("archived", False) and data["local_metadata"]["nsfw"]["ssot"],
                 "subfolders": {
                     main_tag: lambda data: data["local_metadata"]["main_tag"] == main_tag for main_tag in ["person", "clothing", "action", "background", "concept", "style"]
                 }
@@ -262,6 +262,7 @@ Tag organizing configurations in the form
 }
 
 Note, that these configurations are used with separate logic inside the apropriate handler to automatically declare main tags.
+The format can be freely adjusted. The dictionaries are only placed here for degluttering purposes.
 """
 CIVITAI_TAGS_A = {
     "photorealism": ["photorealistic", "photorealism", "realistic"],
