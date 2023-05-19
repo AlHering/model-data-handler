@@ -35,36 +35,48 @@ class CivitaiHandler(AbstractHandler):
         :param args: Arbitrary arguments.
         :param kwargs: Arbitrary keyword arguments.
         """
+        self._logger.info(f"Loading model folders under '{model_folder}'...")
         self.cache["local_models"] = []
+        self.cache["tracked"] = []
         self.cache["not_tracked"] = []
         self.cache["ignored"] = []
-        for root, dirs, files in os.walk(model_folder, topdown=True):
+        for root, _, files in os.walk(model_folder, topdown=True):
+            self._logger.info(f"Checking '{root}'...")
             ignored_subfolder = False
             if any(subfolder in cfg.IGNORE_MODEL_SUBFOLDERS for subfolder in root.replace(model_folder, "").split("/")):
                 ignored_subfolder = True
             for model_file in [file for file in files if any(file.endswith(model_extension) for model_extension in cfg.MODEL_EXTENSIONS)]:
+                self._logger.info(f"Found '{model_file}'.")
                 full_model_path = os.path.join(root, model_file)
-                if model_file not in cfg.IGNORE_MODEL_FILES and not ignored_subfolder:
-                    file_name, file_ext = os.path.splitext(model_file)
-                    model_data = {
-                        "file": model_file,
-                        "extension": file_ext,
-                        "folder": root,
-                        "path": full_model_path,
-                        "sha256": hashing_utility.hash_with_sha256(full_model_path),
-                        "status": "found"
-                    }
-                    api_data = self.collect_metadata("hash", model_data["sha256"])
-                    if api_data:
-                        model_data["metadata"] = api_data
-                        model_data["api_url"] = self.api.get_api_url("id", api_data["modelId"])
-                        model_data["source"] = self.api.base_url
-                        self.cache["local_models"].append(copy.deepcopy(model_data))
-                        model_data["status"] = "collected"
+                if full_model_path not in self.cache["tracked"]:
+                    if model_file not in cfg.IGNORE_MODEL_FILES and not ignored_subfolder:
+                        self._logger.info(f"'{model_file}' is not tracked, collecting data...")
+                        self._logger.info(f"Loading '{root}'...")
+                        _, file_ext = os.path.splitext(model_file)
+                        model_data = {
+                            "file": model_file,
+                            "extension": file_ext,
+                            "folder": root,
+                            "path": full_model_path,
+                            "sha256": hashing_utility.hash_with_sha256(full_model_path),
+                            "status": "found"
+                        }
+                        api_data = self.collect_metadata("hash", model_data["sha256"])
+                        if api_data:
+                            model_data["metadata"] = api_data
+                            model_data["api_url"] = self.api.get_api_url("id", api_data["modelId"])
+                            model_data["source"] = self.api.base_url
+                            model_data["status"] = "collected"
+                            self.cache["local_models"].append(copy.deepcopy(model_data))
+                            self.cache["tracked"].append(full_model_path)
+                        else:
+                            self.cache["not_tracked"].append(full_model_path)
                     else:
-                        self.cache["not_tracked"].append(full_model_path)
+                        self._logger.info(f"Ignoring '{model_file}'.")
+                        self.cache["ignored"].append(full_model_path)
                 else:
-                    self.cache["ignored"].append(full_model_path)
+                    self._logger.info(f"'{model_file}' is already tracked.")
+
 
 
 
