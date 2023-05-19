@@ -8,6 +8,7 @@
 import os
 import copy
 import numpy
+from logging import Logger
 from typing import Any, Optional, List
 from abstract_handler import AbstractHandler
 from civitai_api_wrapper import CivitaiAbstractAPIWrapper
@@ -25,6 +26,7 @@ class CivitaiHandler(AbstractHandler):
         """
         super().__init__(api_wrapper)
         self.nsfw_image_score_threshold = 0.3
+        self.logger = Logger("[CivitaiHandler]")
 
     def load_model_folder(self, model_folder: str, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
@@ -140,6 +142,26 @@ class CivitaiHandler(AbstractHandler):
         return score
 
     def _calculate_main_tag(model: dict) -> Optional[str]:
+        """
+        Internal method for calculating the main model tag.
+        :param model_metadata: Model data.
+        :return: Main model tag or None, if none was found.
+        """
+        if model["metadata"]["type"].lower() in ["checkpoint", "vae"]:
+            current_reference = cfg.DICTS.CIVITAI_TAGS_A
+        else:
+            current_reference = cfg.DICTS.CIVITAI_TAGS_B
+
+        for main_type in current_reference:
+            containing_main = any(tag in model["local_metadata"]["tags"] for tag in current_reference[main_type]) 
+            not_containing_other = not any(any(tag in model["local_metadata"]["tags"] for tag in current_reference[other_type]) for other_type in current_reference if other_type != main_type)
+            if containing_main and not_containing_other:
+                return main_type
+        for main_type in current_reference:
+            if "*" in current_reference[main_type]:
+                return main_type
+            
+    def interactively_type_model(model: dict) -> Optional[str]:
         """
         Internal method for calculating the main model tag.
         :param model_metadata: Model data.

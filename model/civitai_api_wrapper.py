@@ -7,6 +7,7 @@
 """
 import requests
 import json
+from logging import Logger
 from typing import Any, Optional, List
 from ..configuration import configuration as cfg
 from abstract_api_wrapper import AbstractAPIWrapper
@@ -19,6 +20,7 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
         """
         Initiation method.
         """
+        self.logger = Logger("[CivitaiAbstractAPIWrapper]")
         self.base_url = "https://civitai.com/"
         self.api_base_url = "https://civitai.com/api/v1/"
         self.model_by_versionhash_url = "https://civitai.com/api/v1/model-versions/by-hash/"
