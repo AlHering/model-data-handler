@@ -34,7 +34,9 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
         :param kwargs: Arbitrary keyword arguments.
         :return: True if connection was established successfuly else False.
         """
-        return requests.get(self.base_url).status_code == 200
+        result = requests.get(self.base_url).status_code == 200
+        self.logger.info("Connection was successfuly established.") if result else self.logger.warn("Connection could not be established.") 
+        return result
     
     def get_api_url(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> str:
         """
@@ -62,4 +64,5 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
             if meta_data is not None and not "error" in meta_data:
                 return meta_data
         except json.JSONDecodeError:
+                
                 return {}
