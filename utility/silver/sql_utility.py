@@ -24,9 +24,31 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import ProgrammingError, OperationalError
 
 DECLARATIVE_BASE = declarative_base
+SUPPORTED_DIALECTS = ["sqlite", "mysql", "mssql", "postgresql", "mariadb", "oracle"]
 
-PROGRAMMING_ERROR = ProgrammingError
-OPERATIONAL_ERROR = OperationalError
+class UnsupportedDialectError(Exception):
+    """
+    UnsupportedDialectError class.
+    """
+
+    def __init__(self, dialect: str,
+                 message: str = "exception occurred while checking dialect") -> None:
+        """
+        Initiation method for the exception.
+        :param dialect: Unsupported dialect.
+        :param message: Message to include in exception.
+        """
+        self.dialect = dialect
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        """
+        Method for encoding exception as string.
+        :return: Exception string.
+        """
+        return f"{self.message} : {self.dialect} is not in {SUPPORTED_DIALECTS}"
+
 
 # Dictionary, mapping filter types of filters to SQLAlchemy-compatible filters
 SQLALCHEMY_FILTER_CONVERTER = {
