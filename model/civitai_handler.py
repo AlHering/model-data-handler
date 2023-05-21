@@ -6,6 +6,7 @@
 ****************************************************
 """
 import os
+import shutil
 import copy
 import numpy
 from logging import Logger
@@ -56,7 +57,6 @@ class CivitaiHandler(AbstractHandler):
                         model_data = {
                             "file": model_file,
                             "extension": file_ext,
-                            "folder": root,
                             "path": full_model_path,
                             "sha256": hashing_utility.hash_with_sha256(full_model_path),
                             "status": "found"
@@ -77,9 +77,6 @@ class CivitaiHandler(AbstractHandler):
                         self.cache["ignored"].append(full_model_path)
                 else:
                     self._logger.info(f"'{model_file}' is already tracked.")
-
-
-
 
     def update_metadata(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
@@ -124,14 +121,21 @@ class CivitaiHandler(AbstractHandler):
             for root, dirs, files in os.walk(profile["staging_folder"], topdown=True):
                 for file in files:
                     full_model_path = os.path.join(root, file)
-                    model_data_options = [entry for entry in self.cache["local_models"] if entry["path"] == full_model_path]
-                    if full_model_path in self.cache["tracked"]:
+                    if full_model_path in self.cache["tracked"]:                    
+                        model_data_options = [entry for entry in self.cache["local_models"] if entry["path"] == full_model_path]
                         self._logger.info(f"Handling '{file}'...")
                         if len(model_data_options) != 1:
                             self._logger.warn(f"Found {len(model_data_options)} options for '{file}'! Skipping...")
                         else:
                             model_entry = model_data_options[0]
-                            # TODO: Organize...
+                            if profile["sort_into"](model_entry):
+                                self._logger.info(f"Validated '{file}' for sorting.")
+                                for sub_folder in profile["subfolders"]:
+                                    if profile["subfolders"][sub_folder](model_entry):
+                                        target_path = os.path.join(profile["root_folder"], sub_folder)
+                                        self._move_model(model_entry, target_path)
+                                        self._logger.info(f"'{file}' sorted into '{target_path}'.")
+                                    break
                     else:
                         self._logger.warn(f"'{file}' is not tracked.")
 
@@ -216,10 +220,14 @@ class CivitaiHandler(AbstractHandler):
         """
         pass
 
-    def _move_model(model_entry: dict, to_path: str) -> None:
+    def _move_model(self, model_entry: dict, to_folder: str) -> None:
         """
         Internal method for moving model file.
         :param model_entry: Model data entry.
-        :param to_path: Target path for model.
+        :param to_folder: Target folder for model file.
         """ 
-        pass
+        target_path = os.path.join(to_folder, model_entry["file"])
+        shutil.move(model_entry["path"], target_path)
+        self.cache["tracked"][self.cache["tracked"].index(model_entry["path"])] = target_path
+        model_entry["path"] = target_path
+        model_entry["status"] = "sorted"
