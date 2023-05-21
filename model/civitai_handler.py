@@ -69,7 +69,7 @@ class CivitaiHandler(AbstractHandler):
                         api_data = self.collect_metadata("hash", model_data["sha256"])
                         if api_data:
                             model_data["metadata"] = api_data
-                            model_data["api_url"] = self.api.get_api_url("id", api_data["modelId"])
+                            model_data["api_url"] = self.api.get_api_url("hash", model_data["sha256"])
                             model_data["source"] = self.api.base_url
                             model_data["status"] = "collected"
                             self.cache["local_models"].append(copy.deepcopy(model_data))
