@@ -119,7 +119,22 @@ class CivitaiHandler(AbstractHandler):
         :param args: Arbitrary arguments.
         :param kwargs: Arbitrary keyword arguments.
         """
-        pass
+        self._logger.info("Starting model organization...")
+        for profile in [cfg.DICTS.CIVITAI_FOLDER_STRUCTURE[model_type] for model_type in cfg.DICTS.CIVITAI_FOLDER_STRUCTURE]:
+            for root, dirs, files in os.walk(profile["staging_folder"], topdown=True):
+                for file in files:
+                    full_model_path = os.path.join(root, file)
+                    model_data_options = [entry for entry in self.cache["local_models"] if entry["path"] == full_model_path]
+                    if full_model_path in self.cache["tracked"]:
+                        self._logger.info(f"Handling '{file}'...")
+                        if len(model_data_options) != 1:
+                            self._logger.warn(f"Found {len(model_data_options)} options for '{file}'! Skipping...")
+                        else:
+                            model_entry = model_data_options[0]
+                            # TODO: Organize...
+                    else:
+                        self._logger.warn(f"'{file}' is not tracked.")
+
     
     def reorganize_models(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
@@ -199,4 +214,12 @@ class CivitaiHandler(AbstractHandler):
         :param model_metadata: Model data.
         :return: Main model tag or None, if none was set.
         """
+        pass
+
+    def _move_model(model_entry: dict, to_path: str) -> None:
+        """
+        Internal method for moving model file.
+        :param model_entry: Model data entry.
+        :param to_path: Target path for model.
+        """ 
         pass
