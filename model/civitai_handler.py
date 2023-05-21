@@ -179,7 +179,12 @@ class CivitaiHandler(AbstractHandler):
         :param model_entry: Model data of model for which a cover image should be downloaded.
         :param tries: Number of tries, defaults to 3.
         """
-        pass
+        if model_entry["metadata"]["images"]:
+            _, ext = os.path.splitext(model_entry["metadata"]["images"][0]["url"].split("/")[-1])
+            output_path = model_entry["path"].replace(model_entry["extension"], ext)
+            self.download_asset("image", model_entry["metadata"]["images"][0], output_path)
+        else:
+            self._logger.warn(f"'{model_entry['file']}' has no image data.")
 
     def download_model(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
@@ -189,16 +194,18 @@ class CivitaiHandler(AbstractHandler):
         """
         pass
 
-    def download_asset(self, asset_type: str, asset_url: str, output_path: str, tries: int = 3) -> None:
+    def download_asset(self, asset_type: str, asset_data: dict, output_path: str, tries: int = 3) -> None:
         """
         Method for downloading an asset.
         :param asset_type: Asset type.
-        :param asset_url: Asset URL.
+        :param asset_data: Asset data.
         :param output_path: Target output path.
         :param tries: Number of tries, defaults to 3.
         """
         if asset_type == "image":
-            self._download_image(asset_url, output_path, tries, True)
+            image_url = asset_data["url"]
+            image_width = asset_data["width"]
+            self._download_image(self._image_url_for_width(image_url, image_width), output_path, tries, True)
         else:
             self._logger.warn(f"Asset type '{asset_type}' is unknown.")
 
