@@ -202,7 +202,7 @@ class CivitaiHandler(AbstractHandler):
         else:
             self._logger.warn(f"Asset type '{asset_type}' is unknown.")
 
-    def download_image(self, image_url: str, output_path: str, tries: int = 3, try_different_resolutions: bool = True) -> True:
+    def download_image(self, image_url: str, output_path: str, tries: int = 3, try_different_resolutions: bool = False) -> True:
         """
         Method for downloading an image.
         :param image_url: Image URL.
@@ -227,7 +227,7 @@ class CivitaiHandler(AbstractHandler):
             os.remove(output_path)
         if try_different_resolutions:
             for resolution_width in self.standard_img_widths:
-                if self.download_image(self._image_url_for_width(image_url, resolution_width), output_path, tries, False):
+                if self.download_image(self._image_url_for_width(image_url, resolution_width), output_path, tries):
                     return True
         return False
 
