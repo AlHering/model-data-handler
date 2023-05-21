@@ -146,7 +146,37 @@ class CivitaiHandler(AbstractHandler):
         :param args: Arbitrary arguments.
         :param kwargs: Arbitrary keyword arguments.
         """
-        pass
+        self._logger.info("Starting model reorganization...")
+        for profile in [cfg.DICTS.CIVITAI_FOLDER_STRUCTURE[model_type] for model_type in cfg.DICTS.CIVITAI_FOLDER_STRUCTURE]:
+            for root, dirs, files in os.walk(profile["root_folder"], topdown=True):
+                for file in files:
+                    full_model_path = os.path.join(root, file)
+                    if full_model_path in self.cache["tracked"]:
+                        self._sort_model(full_model_path, profile)
+                    else:
+                        self._logger.warn(f"'{full_model_path}' is not tracked.")    
+                    
+
+    def _sort_model(self, file_path: str, sorting_profile: dict) -> None:
+        """
+        Internal method for sorting a model file.
+        :param file_path: Model file path.
+        :param sorting_profile: Sorting profile.
+        """               
+        model_data_options = [entry for entry in self.cache["local_models"] if entry["path"] == file_path]
+        self._logger.info(f"Handling '{file_path}'...")
+        if len(model_data_options) != 1:
+            self._logger.warn(f"Found {len(model_data_options)} options for '{file_path}'! Skipping...")
+        else:
+            model_entry = model_data_options[0]
+            if sorting_profile["sort_into"](model_entry):
+                self._logger.info(f"Validated '{file_path}' for sorting.")
+                for sub_folder in sorting_profile["subfolders"]:
+                    if sorting_profile["subfolders"][sub_folder](model_entry):
+                        target_path = os.path.join(sorting_profile["root_folder"], sub_folder)
+                        self._move_model(model_entry, target_path)
+                        self._logger.info(f"'{file_path}' sorted into '{target_path}'.")
+                        break
 
     def download_model(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
