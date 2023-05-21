@@ -7,11 +7,13 @@
 """
 import os
 import functools
-import multiprocessing.pool
+import functools
+import multiprocessing
+from multiprocessing.pool import ThreadPool
+import urllib3
 import random
 import socket
 import logging
-from dns import resolver
 from time import sleep
 from typing import Any, Optional
 
@@ -110,13 +112,27 @@ def check_port_usable(port: int) -> bool:
         return False
 
 
-def resolve_via_dns(target_url: str, dns: str) -> str:
+def timeout(max_timeout: float) -> Any:
     """
-    Function for resolving address via DNS.
-    :param target_url: Target URL.
-    :param dns: DNS.
-    :return: Resolved address.
+    Timeout decorator, parameter in seconds.
+    Taken from https://stackoverflow.com/questions/492519/timeout-on-a-function-call.
+    :return: Wrapped function result, if process was successful, else
+        'TIMOUT_DECORATOR_TIMEOUT_SIGNAL': Process timed out
+        'URLLIB_PROTOCOL_ERROR_SIGNAL': Process resulted in urllib error.
     """
-    res = resolver.Resolver()
-    res.nameservers = [dns]
-    return res.resolve(target_url)
+    def timeout_decorator(item):
+        """Wrap the original function."""
+        @functools.wraps(item)
+        def func_wrapper(*args: Optional[Any], **kwargs: Optional[Any]):
+            """Closure for function."""
+            pool = ThreadPool(processes=1)
+            async_result = pool.apply_async(item, args, kwargs)
+            # raises a TimeoutError if execution exceeds max_timeout
+            try:
+                return async_result.get(max_timeout)
+            except multiprocessing.context.TimeoutError:
+                return "TIMOUT_DECORATOR_TIMEOUT_SIGNAL"
+            except urllib3.exceptions.ProtocolError:
+                return "URLLIB_PROTOCOL_ERROR_SIGNAL"
+        return func_wrapper
+    return timeout_decorator
