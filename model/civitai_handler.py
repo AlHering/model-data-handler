@@ -8,12 +8,16 @@
 import os
 import shutil
 import copy
+import requests
 import numpy
+import traceback
+from time import sleep
 from logging import Logger
 from typing import Any, Optional, List
 from abstract_handler import AbstractHandler
 from civitai_api_wrapper import CivitaiAbstractAPIWrapper
 from ..utility.bronze import hashing_utility, dictionary_utility
+from ..utility.silver import image_utility, internet_utility
 from ..configuration import configuration as cfg
 
 
@@ -28,6 +32,7 @@ class CivitaiHandler(AbstractHandler):
         super().__init__(api_wrapper)
         self.nsfw_image_score_threshold = 0.3
         self._logger = Logger("[CivitaiHandler]")
+        self.standard_img_widths = [1080, 720, 576, 480]
 
     def load_model_folder(self, model_folder: str, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
@@ -168,6 +173,14 @@ class CivitaiHandler(AbstractHandler):
         else:
             self._logger.warn(f"'{file_path}' is not tracked.")
 
+    def _download_model_cover(self, model_entry: dict, tries: int = 3) -> None:
+        """
+        Internal method for downloading model cover image.
+        :param model_entry: Model data of model for which a cover image should be downloaded.
+        :param tries: Number of tries, defaults to 3.
+        """
+        pass
+
     def download_model(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
         Method for downloading a model.
@@ -176,13 +189,61 @@ class CivitaiHandler(AbstractHandler):
         """
         pass
 
-    def download_asset(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
+    def download_asset(self, asset_type: str, asset_url: str, output_path: str, tries: int = 3) -> None:
         """
         Method for downloading an asset.
-        :param args: Arbitrary arguments.
-        :param kwargs: Arbitrary keyword arguments.
+        :param asset_type: Asset type.
+        :param asset_url: Asset URL.
+        :param output_path: Target output path.
+        :param tries: Number of tries, defaults to 3.
         """
-        pass
+        if asset_type == "image":
+            self._download_image(asset_url, output_path, tries)
+        else:
+            self._logger.warn(f"Asset type '{asset_type}' is unknown.")
+
+    def download_image(self, image_url: str, output_path: str, tries: int = 3, try_different_resolutions: bool = True) -> True:
+        """
+        Method for downloading an image.
+        :param image_url: Image URL.
+        :param output_path: Target output path.
+        :param tries: Number of tries, defaults to 3.
+        :param try_different_resolutions: Flag for trying different resolutions. 
+            Note, that tries then extend to <tries> * <number of resolutions> + 1.
+        :return: True, if process was successful, else False.
+        """
+        counter = 0
+        while counter < 3:
+            try:
+                res = self.api.download_image(image_url, output_path)
+                if res and not res in ["TIMOUT_DECORATOR_TIMEOUT_SIGNAL", "URLLIB_PROTOCOL_ERROR_SIGNAL"]:
+                    return True
+                else:
+                    counter += 1
+            except Exception as ex:
+                counter += 1
+                self._logger.warn(f"'{ex}' occured while downloading '{image_url}' ({counter} tries).\n\n{traceback.format_exc()}")
+        if counter == 4 and os.path.exists(output_path):
+            os.remove(output_path)
+        if try_different_resolutions:
+            for resolution_width in self.standard_img_widths:
+                if self.download_image(self._image_url_for_width(image_url, resolution_width), output_path, tries, False):
+                    return True
+        return False
+
+    def _image_url_for_width(self, image_url: dict, width: int) -> str:
+        """
+        Function for getting image URL for specific width.
+        :param image_url: Image URL.
+        :param width: Width to use.
+        :return: Image URL for specific width.
+        """
+        img_url_parts = image_url.split("/")
+        for index, part in enumerate(img_url_parts):
+            if part.startswith("width="):
+                img_url_parts[index] = f"width={width}"
+        return "/".join(img_url_parts)
+            
 
     def _calculate_image_nsfw_score(self, model: dict) -> Optional[float]:
         """
