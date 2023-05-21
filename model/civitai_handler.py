@@ -46,7 +46,7 @@ class CivitaiHandler(AbstractHandler):
             ignored_subfolder = False
             if any(subfolder in cfg.IGNORE_MODEL_SUBFOLDERS for subfolder in root.replace(model_folder, "").split("/")):
                 ignored_subfolder = True
-            for model_file in [file for file in files if any(file.endswith(model_extension) for model_extension in cfg.MODEL_EXTENSIONS)]:
+            for model_file in self.extract_model_files(files):
                 self._logger.info(f"Found '{model_file}'.")
                 full_model_path = os.path.join(root, model_file)
                 if full_model_path not in self.cache["tracked"]:
@@ -77,6 +77,14 @@ class CivitaiHandler(AbstractHandler):
                         self.cache["ignored"].append(full_model_path)
                 else:
                     self._logger.info(f"'{model_file}' is already tracked.")
+    
+    def extract_model_files(self, files: List[str]) -> List[str]:
+        """
+        Method for extracting model files from a list of files (by extension).
+        :param files: List of all files.
+        :return: List of extracted model files.
+        """
+        return [file for file in files if any(file.endswith(model_extension) for model_extension in cfg.MODEL_EXTENSIONS)]
 
     def update_metadata(self, *args: Optional[List], **kwargs: Optional[dict]) -> None:
         """
@@ -118,8 +126,8 @@ class CivitaiHandler(AbstractHandler):
         """
         self._logger.info("Starting model organization...")
         for profile in [cfg.DICTS.CIVITAI_FOLDER_STRUCTURE[model_type] for model_type in cfg.DICTS.CIVITAI_FOLDER_STRUCTURE]:
-            for root, dirs, files in os.walk(profile["staging_folder"], topdown=True):
-                for file in files:
+            for root, _, files in os.walk(profile["staging_folder"], topdown=True):
+                for file in self.extract_model_files(files):
                     self._sort_model(os.path.join(root, file), profile)
 
     
@@ -131,8 +139,8 @@ class CivitaiHandler(AbstractHandler):
         """
         self._logger.info("Starting model reorganization...")
         for profile in [cfg.DICTS.CIVITAI_FOLDER_STRUCTURE[model_type] for model_type in cfg.DICTS.CIVITAI_FOLDER_STRUCTURE]:
-            for root, dirs, files in os.walk(profile["root_folder"], topdown=True):
-                for file in files:
+            for root, _, files in os.walk(profile["root_folder"], topdown=True):
+                for file in self.extract_model_files(files):
                     self._sort_model(os.path.join(root, file), profile)  
                     
 
