@@ -173,11 +173,10 @@ class CivitaiHandler(AbstractHandler):
         else:
             self._logger.warn(f"'{file_path}' is not tracked.")
 
-    def _download_model_cover(self, model_entry: dict, tries: int = 3) -> None:
+    def _download_model_cover(self, model_entry: dict) -> None:
         """
         Internal method for downloading model cover image.
         :param model_entry: Model data of model for which a cover image should be downloaded.
-        :param tries: Number of tries, defaults to 3.
         """
         if model_entry["metadata"]["images"]:
             _, ext = os.path.splitext(model_entry["metadata"]["images"][0]["url"].split("/")[-1])
