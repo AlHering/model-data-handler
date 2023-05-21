@@ -7,8 +7,11 @@
 """
 import requests
 import json
+from time import sleep
+import shutil
 from logging import Logger
 from typing import Any, Optional, List
+from ..utility.silver import image_utility, internet_utility
 from ..configuration import configuration as cfg
 from abstract_api_wrapper import AbstractAPIWrapper
 
@@ -36,6 +39,24 @@ class CivitaiAbstractAPIWrapper(AbstractAPIWrapper):
         result = requests.get(self.base_url).status_code == 200
         self._logger.info("Connection was successfuly established.") if result else self._logger.warn("Connection could not be established.") 
         return result
+    
+    @internet_utility.timeout(360.0)
+    def download_image(url: str, output_path: str) -> bool:
+        """
+        Method for downloading image to disk.
+        :param url: Image URL.
+        :param output_path: Output path.
+        :return: True, if process was successful, else False.
+        """
+        sleep(2)
+        download = requests.get(url, stream=True, headers={"Authorization": cfg.CIVITAI_API_KEY})
+        with open(output_path, 'wb') as file:
+            shutil.copyfileobj(download.raw, file)
+        del download
+        if image_utility.check_image_health(output_path):
+            return True
+        else:
+            return False
     
     def get_api_url(self, identifier: str, model_id: Any, *args: Optional[List], **kwargs: Optional[dict]) -> str:
         """
