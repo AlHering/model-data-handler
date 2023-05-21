@@ -198,7 +198,7 @@ class CivitaiHandler(AbstractHandler):
         :param tries: Number of tries, defaults to 3.
         """
         if asset_type == "image":
-            self._download_image(asset_url, output_path, tries)
+            self._download_image(asset_url, output_path, tries, True)
         else:
             self._logger.warn(f"Asset type '{asset_type}' is unknown.")
 
